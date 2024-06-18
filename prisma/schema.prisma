@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar(255)
+  username      String?         @db.VarChar(255)
+  email         String          @db.VarChar(255)
+  password      String          @db.VarChar(255)
+  profileUrl    String?         @map("profile_url") @db.VarChar(255)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  recomendation recomendation[]
+
+  @@map("users")
+}
+
+model kegiatan {
+  id                 Int             @id @default(autoincrement())
+  kategori           String          @db.VarChar(255)
+  subKategori        String          @map("sub_kategori") @db.VarChar(255)
+  penyelenggara      String          @db.VarChar(255)
+  posisi             String          @db.VarChar(255)
+  deskripsi          String          @db.Text
+  durasi             String          @db.VarChar(255)
+  tanggalPendaftaran String          @map("tanggal_pendaftaran") @db.VarChar(255)
+  link               String          @db.VarChar(255)
+  cp                 String          @db.VarChar(255)
+  jenisKontak        String          @map("jenis_kontak") @db.VarChar(255)
+  lokasi             String          @db.VarChar(255)
+  persyaratan        String          @db.LongText
+  skill              String          @db.LongText
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  recomendation      recomendation[]
+}
+
+model recomendation {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  kegiatanId Int      @map("kegiatan_id")
+  rate       Decimal  @db.Decimal(15, 5)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     user     @relation(fields: [userId], references: [id])
+  kegiatan kegiatan @relation(fields: [kegiatanId], references: [id])
+
+  @@map("recomendations")
+}
